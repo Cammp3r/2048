@@ -22,14 +22,26 @@ async function handleInput(event) {
             await moveUp();
             break;
             case "ArrowDown":
+                if (!canMoveDown()) {
+                    setupInputOnce();
+                    return;
+                }
             await moveDown();
             
             break;
             case "ArrowLeft":
+                if (!canMoveLeft()) {
+                    setupInputOnce();
+                    return;
+                }
             await moveLeft();
             
             break;
             case "ArrowRight":
+                if (!canMoveRight()) {
+                    setupInputOnce();
+                    return;
+                }
             await moveRight();
             
             break;
@@ -41,6 +53,13 @@ async function handleInput(event) {
 
     const newTile = new Tile(gameBoard);
     grid.getRandomEmptyCell().linkTile(newTile);
+
+    if (!canMoveUp() && !canMoveDown() && !canMoveLeft() && !canMoveRight()) {
+        await newTile.waitForAnimationEnd();
+        alert("Try again!")
+        return;
+    }
+
 
     setupInputOnce();
 
@@ -105,6 +124,18 @@ function slideTilesInGroup(group, promises) {
 
 function canMoveUp() {
     return canMove(grid.cellsGroupedByColumn);
+}
+
+function canMoveDown() {
+    return canMove(grid.cellsGroupedByReversedColumn);
+}
+
+function canMoveLeft() {
+    return canMove(grid.cellsGroupedByRow);
+}
+
+function canMoveRight() {
+    return canMove(grid.cellsGroupedByReversedRow);
 }
 
 function canMove(groupedCells) {
